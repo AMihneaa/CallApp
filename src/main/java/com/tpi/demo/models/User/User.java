@@ -40,6 +40,4 @@ public class User {
     @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-zA-Z]).{8,}$", message = "Password must contain at least one letter and one number")
     private String password;
 
-
-
 }
