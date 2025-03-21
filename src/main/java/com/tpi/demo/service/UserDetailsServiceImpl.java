@@ -41,7 +41,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         // Convert User to UserDetails Object
         return new org.springframework.security.core.userdetails.User(
-                user.getUserName(), // Pass Username
+                user.getEmail(), // Pass Username
                 user.getPassword(), // Pass Password
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")) // Default Role
         );
