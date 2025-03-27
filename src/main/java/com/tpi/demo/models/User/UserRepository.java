@@ -1,6 +1,5 @@
-package com.tpi.demo.repositories;
+package com.tpi.demo.models.User;
 
-import com.tpi.demo.models.User.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
