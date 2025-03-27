@@ -33,7 +33,7 @@ public class UserService {
 
         Role defaultRole = roleRepository.findByName("ROLE_USER")
                 .orElseThrow(
-                        () -> new RuntimeException("Defualt Role not found!")
+                        () -> new RuntimeException("Default Role not found!")
                 );
 
         User user = userMapper.registerUserToDTO(dto);
