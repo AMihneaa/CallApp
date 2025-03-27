@@ -1,17 +1,17 @@
 package com.tpi.demo.service;
 
 import com.tpi.demo.models.User.User;
-import com.tpi.demo.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.tpi.demo.models.User.UserRepository;
+
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-
-import java.util.Collections;
-import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /*
     Implement UserDetailsService interface from Spring Security
@@ -21,8 +21,11 @@ import java.util.Optional;
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    @Autowired private UserRepository userRepository;
+    private final UserRepository userRepository;
 
+    public UserDetailsServiceImpl(UserRepository userRepository){
+        this.userRepository = userRepository;
+    }
 
     /*
         Email as parameter
@@ -39,11 +42,28 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                         () -> new UsernameNotFoundException("User not exists!")
                 );
 
+        Set<SimpleGrantedAuthority> authorities = user.getRoles().stream()
+                .flatMap(role -> {
+                    // Add role name as authority
+                    Stream<SimpleGrantedAuthority> roleStream = Stream.of(
+                            new SimpleGrantedAuthority(role.getName())
+                    );
+
+                    // Add Privileges as authorities
+                    Stream<SimpleGrantedAuthority> privilegeStream = role.getPrivilege()
+                            .stream()
+                            .map(privilege -> new SimpleGrantedAuthority(privilege.getName()));
+
+                    return Stream.concat(roleStream, privilegeStream);
+                })
+                .collect(Collectors.toSet());
+
+
         // Convert User to UserDetails Object
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(), // Pass Username
                 user.getPassword(), // Pass Password
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")) // Default Role
+                authorities
         );
     }
 }
