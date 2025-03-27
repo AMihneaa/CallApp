@@ -27,9 +27,12 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.authorizeHttpRequests(
+        httpSecurity
+                .csrf(csrfConfigurer -> csrfConfigurer.disable())
+                .authorizeHttpRequests(
                         (authorize) -> authorize
-                                .requestMatchers("/login", "/register").permitAll()
+                                .requestMatchers("/login").permitAll()
+                                .requestMatchers("/user/register").permitAll()
                                 .requestMatchers("/test/**").authenticated() // Require authentication for /test/**
                                 .anyRequest().authenticated() // Allow authenticated users for any other routes
                 )

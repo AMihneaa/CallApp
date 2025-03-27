@@ -54,8 +54,8 @@ public class DataLoader implements CommandLineRunner {
         Privilege user_viewTest = createPrivilegeIfNotFound("user_viewTest");
         Privilege admin_viewTest = createPrivilegeIfNotFound("admin_viewTest");
 
-        Role USER_ROLE = createRoleIfNotFound("USER_ROLE", Set.of(user_viewTest));
-        Role ADMIN_ROLE = createRoleIfNotFound("ADMIN_ROLE", Set.of(admin_viewTest));
+        Role USER_ROLE = createRoleIfNotFound("ROLE_USER", Set.of(user_viewTest));
+        Role ADMIN_ROLE = createRoleIfNotFound("ROLE_ADMIN", Set.of(admin_viewTest));
 
 
         List<User> userList = new ArrayList<>();
