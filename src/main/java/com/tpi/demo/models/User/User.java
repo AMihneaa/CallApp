@@ -1,28 +1,29 @@
 package com.tpi.demo.models.User;
 
+import com.tpi.demo.models.Role.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.annotation.Collation;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.HashSet;
+import java.util.Set;
 
-
-@Collation("Account") // Custom Collaction for User Class
+@Document("users")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = "password")
 public class User {
 
     @Id // Identifier for the document
-    private String ID;
+    private String id;
 
     @Field("username")
     @NotBlank(message = "Username field is required!")
@@ -40,4 +41,13 @@ public class User {
     @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-zA-Z]).{8,}$", message = "Password must contain at least one letter and one number")
     private String password;
 
+    @DBRef
+    private Set<Role> roles = new HashSet<>();
+
+    public User(String userName, String email, String password, Set<Role> roles){
+        this.userName = userName;
+        this.email = email;
+        this.password = password;
+        this.roles = roles;
+    }
 }

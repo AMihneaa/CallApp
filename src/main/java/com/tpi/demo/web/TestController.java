@@ -1,5 +1,6 @@
 package com.tpi.demo.web;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,5 +12,17 @@ public class TestController {
     @GetMapping("/")
     public String test() {
         return "Server is running and u on";
+    }
+
+    @GetMapping("/user")
+    @PreAuthorize("hasAuthority('USER_ROLE')")
+    public String userTest(){
+        return "User Page";
+    }
+
+    @GetMapping("/admin")
+    @PreAuthorize("hasAuthority('ADMIN_ROLE')")
+    public String adminTest(){
+        return "Admin Page";
     }
 }
