@@ -8,10 +8,11 @@ import com.tpi.demo.models.User.UserRegisterDTO;
 import com.tpi.demo.models.User.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
-@Component
+@Service
 public class UserService {
 
     private final UserRepository userRepository;

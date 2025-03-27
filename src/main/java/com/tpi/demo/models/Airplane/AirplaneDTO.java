@@ -14,4 +14,11 @@ public class AirplaneDTO {
     private String airline;
 
     private String status;
+
+    public AirplaneDTO(String model, int seatingCapacity, String airline, String status){
+        this.model = model;
+        this.seatingCapacity = seatingCapacity;
+        this.airline = airline;
+        this.status = status;
+    }
 }
