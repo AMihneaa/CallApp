@@ -50,4 +50,15 @@ public class User {
         this.password = password;
         this.roles = roles;
     }
+
+    public User(String userName, String email, String password){
+        this.userName = userName;
+        this.email = email;
+        this.password = password;
+    }
+
+    public User(String userName, Set<Role> roles){
+        this.userName = userName;
+        this.roles = roles;
+    }
 }
