@@ -1,5 +1,7 @@
 package com.tpi.demo.config;
 
+import com.tpi.demo.models.Airplane.Airplane;
+import com.tpi.demo.models.Airplane.AirplaneRepository;
 import com.tpi.demo.models.Privilege.Privilege;
 import com.tpi.demo.models.Privilege.PrivilegeRepository;
 import com.tpi.demo.models.Role.Role;
@@ -13,7 +15,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @Component
@@ -30,6 +31,9 @@ public class DataLoader implements CommandLineRunner {
 
     @Autowired
     private RoleRepository roleRepository;
+
+    @Autowired
+    private AirplaneRepository airplaneRepository;
 
     private Privilege createPrivilegeIfNotFound(String name){
         return privilegeRepository.findByName(name)
@@ -49,8 +53,7 @@ public class DataLoader implements CommandLineRunner {
                 );
     }
 
-    @Override
-    public void run(String... args) throws Exception{
+    public void AddUsers(){
         Privilege user_viewTest = createPrivilegeIfNotFound("user_viewTest");
         Privilege admin_viewTest = createPrivilegeIfNotFound("admin_viewTest");
 
@@ -78,10 +81,38 @@ public class DataLoader implements CommandLineRunner {
                 )
         );
 
-        userList.forEach(user -> {
-             userRepository.findByEmail(user.getEmail())
-                    .orElseGet(() -> userRepository.save(user));
-        });
+        userList.forEach(
+                user -> userRepository.findByEmail(user.getEmail())
+                    .orElseGet(() -> userRepository.save(user))
+        );
+    }
+
+    public void AddPlanes(){
+        List<Airplane> airplanes = new ArrayList<>();
+        airplanes.add(
+                new Airplane("Boeing 737", 20,"Lufthansa", "ACTIVE")
+        );
+
+        airplanes.add(
+                new Airplane("TestModel", 100, "Loky", "MAINTENANCE")
+        );
+
+        airplanes.add(
+                new Airplane("CEVAModel", 2, "Ceva", "ACTIVE")
+        );
+
+        airplanes.forEach(
+                plane -> airplaneRepository.findAirplaneByModel(plane.getModel())
+                            .orElseGet(
+                                    () -> airplaneRepository.save(plane)
+                            )
+        );
+    }
+
+    @Override
+    public void run(String... args) throws Exception{
+        AddUsers();
+        AddPlanes();
     }
 
 }
