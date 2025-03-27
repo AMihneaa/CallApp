@@ -17,4 +17,8 @@ public class Privilege {
     private String id;
 
     private String name;
+
+    public Privilege (String name){
+        this.name = name;
+    }
 }

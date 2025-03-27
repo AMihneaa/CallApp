@@ -22,8 +22,14 @@ public class Role {
     @Id
     private Long id;
 
+
     private String name;
 
     @DBRef
     private Set<Privilege> privilege = new HashSet<>();
+
+    public Role(String name, Set<Privilege> privileges){
+        this.name = name;
+        this.privilege = privileges;
+    }
 }
