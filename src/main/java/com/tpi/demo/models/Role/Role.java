@@ -12,7 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.HashSet;
 import java.util.Set;
 
-@Document(collation = "roles")
+@Document("roles")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,7 +20,7 @@ import java.util.Set;
 public class Role {
 
     @Id
-    private Long id;
+    private String id;
 
 
     private String name;
