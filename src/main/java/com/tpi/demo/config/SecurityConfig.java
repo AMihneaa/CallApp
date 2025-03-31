@@ -33,7 +33,7 @@ public class SecurityConfig {
                         (authorize) -> authorize
                                 .requestMatchers("/login").permitAll()
                                 .requestMatchers("/user/register").permitAll()
-                                .requestMatchers("/test/**").authenticated() // Require authentication for /test/**
+                                .requestMatchers("/test/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN") // Require authentication for /test/**
                                 .anyRequest().authenticated() // Allow authenticated users for any other routes
                 )
                 .httpBasic(Customizer.withDefaults())

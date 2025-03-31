@@ -7,7 +7,6 @@ import com.tpi.demo.models.User.User;
 import com.tpi.demo.models.User.UserRegisterDTO;
 import com.tpi.demo.models.User.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;

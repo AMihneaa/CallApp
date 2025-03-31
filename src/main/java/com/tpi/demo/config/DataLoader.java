@@ -2,10 +2,14 @@ package com.tpi.demo.config;
 
 import com.tpi.demo.models.Airplane.Airplane;
 import com.tpi.demo.models.Airplane.AirplaneRepository;
+import com.tpi.demo.models.Enums.TransportType;
+import com.tpi.demo.models.Point.StopPoint;
 import com.tpi.demo.models.Privilege.Privilege;
 import com.tpi.demo.models.Privilege.PrivilegeRepository;
 import com.tpi.demo.models.Role.Role;
 import com.tpi.demo.models.Role.RoleRepository;
+import com.tpi.demo.models.Route.Route;
+import com.tpi.demo.models.Route.RouteRepository;
 import com.tpi.demo.models.User.User;
 import com.tpi.demo.models.User.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -34,6 +39,9 @@ public class DataLoader implements CommandLineRunner {
 
     @Autowired
     private AirplaneRepository airplaneRepository;
+
+    @Autowired
+    private RouteRepository routeRepository;
 
     private Privilege createPrivilegeIfNotFound(String name){
         return privilegeRepository.findByName(name)
@@ -109,10 +117,47 @@ public class DataLoader implements CommandLineRunner {
         );
     }
 
+    public void AddRoutes(){
+        List<StopPoint> bucuresti_constanta = new ArrayList<>();
+
+        bucuresti_constanta.add(new StopPoint("bucuresti", LocalDateTime.of(2025, 4, 10, 9, 0), LocalDateTime.of(2025, 4, 10, 9, 10)));
+        bucuresti_constanta.add(new StopPoint("fetesti", LocalDateTime.of(2025, 4, 10, 11, 30), LocalDateTime.of(2025, 4, 10, 11, 30)));
+        bucuresti_constanta.add(new StopPoint("constanta", LocalDateTime.of(2025, 4, 10, 13, 45), null));
+
+        List<StopPoint> festesti_constanta = new ArrayList<>();
+
+        festesti_constanta.add(new StopPoint("fetesti", LocalDateTime.of(2025, 3, 10, 11, 30), LocalDateTime.of(2025, 4, 10, 11, 30)));
+        festesti_constanta.add(new StopPoint("constanta", LocalDateTime.of(2025, 4, 10, 13, 45), null));
+
+
+        List<Route> routes = new ArrayList<>();
+
+        List<Airplane> airplane = airplaneRepository.findAll();
+
+        routes.add(
+                new Route(bucuresti_constanta, airplane.stream().findFirst().toString(), TransportType.AIRPLANE, 20)
+        );
+        routes.add(
+                new Route(festesti_constanta, airplane.get(2).toString(), TransportType.AIRPLANE, 30)
+        );
+
+        routes.forEach(route -> {
+            boolean exists = routeRepository.existsByTransportIdAndStops_DepartureTime(
+                    route.getTransportId(),
+                    route.getStops().get(0).getDepartureTime()
+            );
+
+            if (!exists) {
+                routeRepository.save(route);
+            }
+        });
+    }
+
     @Override
     public void run(String... args) throws Exception{
         AddUsers();
         AddPlanes();
+        AddRoutes();
     }
 
 }
