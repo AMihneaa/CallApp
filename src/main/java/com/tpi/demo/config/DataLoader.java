@@ -98,15 +98,15 @@ public class DataLoader implements CommandLineRunner {
     public void AddPlanes(){
         List<Airplane> airplanes = new ArrayList<>();
         airplanes.add(
-                new Airplane("Boeing 737", 20,"Lufthansa", "ACTIVE")
+                new Airplane("Boeing 737", 20,"Lufthansa")
         );
 
         airplanes.add(
-                new Airplane("TestModel", 100, "Loky", "MAINTENANCE")
+                new Airplane("TestModel", 100, "Loky")
         );
 
         airplanes.add(
-                new Airplane("CEVAModel", 2, "Ceva", "ACTIVE")
+                new Airplane("CEVAModel", 2, "Ceva")
         );
 
         airplanes.forEach(
@@ -135,10 +135,10 @@ public class DataLoader implements CommandLineRunner {
         List<Airplane> airplane = airplaneRepository.findAll();
 
         routes.add(
-                new Route(bucuresti_constanta, airplane.stream().findFirst().toString(), TransportType.AIRPLANE, 20)
+                new Route(bucuresti_constanta, airplane.get(0).getId(), TransportType.AIRPLANE, 20)
         );
         routes.add(
-                new Route(festesti_constanta, airplane.get(2).toString(), TransportType.AIRPLANE, 30)
+                new Route(festesti_constanta, airplane.get(1).getId(), TransportType.AIRPLANE, 30)
         );
 
         routes.forEach(route -> {
@@ -155,9 +155,23 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception{
-        AddUsers();
-        AddPlanes();
-        AddRoutes();
+        if (args.length > 0) {
+            switch (args[0].toLowerCase()) {
+                case "user":
+                    AddUsers();
+                    break;
+                case "plane":
+                    AddPlanes();
+                    break;
+                case "route":
+                    AddRoutes();
+                    break;
+                default:
+                    System.out.println("Invalid argument. Use 'user', 'plane', or 'route'.");
+            }
+        } else {
+            System.out.println("No arguments provided. Use 'user', 'plane', or 'route'.");
+        }
     }
 
 }

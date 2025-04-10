@@ -1,5 +1,6 @@
 package com.tpi.demo.models.Route;
 
+import com.tpi.demo.models.Enums.Status;
 import com.tpi.demo.models.Enums.TransportType;
 import com.tpi.demo.models.Point.StopPoint;
 import lombok.Getter;
@@ -25,7 +26,7 @@ public class Route {
 
     private int availableSeats;
 
-    private boolean isActive;
+    private Status status = Status.INACTIVE;
 
 
     public Route(List<StopPoint> stops, String transportId, TransportType transportType, int availableSeats){
