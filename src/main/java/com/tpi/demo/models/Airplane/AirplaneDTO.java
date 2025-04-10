@@ -1,5 +1,6 @@
 package com.tpi.demo.models.Airplane;
 
+import com.tpi.demo.models.Enums.Status;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,9 +14,9 @@ public class AirplaneDTO {
 
     private String airline;
 
-    private String status;
+    private Status status;
 
-    public AirplaneDTO(String model, int seatingCapacity, String airline, String status){
+    public AirplaneDTO(String model, int seatingCapacity, String airline, Status status){
         this.model = model;
         this.seatingCapacity = seatingCapacity;
         this.airline = airline;

@@ -2,6 +2,8 @@ package com.tpi.demo.config;
 
 import com.tpi.demo.models.Airplane.Airplane;
 import com.tpi.demo.models.Airplane.AirplaneRepository;
+import com.tpi.demo.models.Bus.Bus;
+import com.tpi.demo.models.Bus.BusRepository;
 import com.tpi.demo.models.Enums.TransportType;
 import com.tpi.demo.models.Point.StopPoint;
 import com.tpi.demo.models.Privilege.Privilege;
@@ -42,6 +44,9 @@ public class DataLoader implements CommandLineRunner {
 
     @Autowired
     private RouteRepository routeRepository;
+
+    @Autowired
+    private BusRepository busRepository;
 
     private Privilege createPrivilegeIfNotFound(String name){
         return privilegeRepository.findByName(name)
@@ -98,15 +103,15 @@ public class DataLoader implements CommandLineRunner {
     public void AddPlanes(){
         List<Airplane> airplanes = new ArrayList<>();
         airplanes.add(
-                new Airplane("Boeing 737", 20,"Lufthansa", "ACTIVE")
+                new Airplane("Boeing 737", 20,"Lufthansa")
         );
 
         airplanes.add(
-                new Airplane("TestModel", 100, "Loky", "MAINTENANCE")
+                new Airplane("TestModel", 100, "Loky")
         );
 
         airplanes.add(
-                new Airplane("CEVAModel", 2, "Ceva", "ACTIVE")
+                new Airplane("CEVAModel", 2, "Ceva")
         );
 
         airplanes.forEach(
@@ -135,10 +140,10 @@ public class DataLoader implements CommandLineRunner {
         List<Airplane> airplane = airplaneRepository.findAll();
 
         routes.add(
-                new Route(bucuresti_constanta, airplane.stream().findFirst().toString(), TransportType.AIRPLANE, 20)
+                new Route(bucuresti_constanta, airplane.get(0).getId(), TransportType.AIRPLANE, 20)
         );
         routes.add(
-                new Route(festesti_constanta, airplane.get(2).toString(), TransportType.AIRPLANE, 30)
+                new Route(festesti_constanta, airplane.get(1).getId(), TransportType.AIRPLANE, 30)
         );
 
         routes.forEach(route -> {
@@ -153,11 +158,46 @@ public class DataLoader implements CommandLineRunner {
         });
     }
 
+    private void AddBuses(){
+        List<Bus> buses = new ArrayList<>();
+
+        buses.add(
+                new Bus("model 1", 10, "company1")
+        );
+        buses.add(
+                new Bus("model 2", 15, "company2")
+        );
+
+        buses.forEach(
+                bus -> busRepository.findByModel(bus.getModel())
+                        .orElseGet(
+                                () -> busRepository.save(bus)
+                        )
+        );
+    }
+
     @Override
     public void run(String... args) throws Exception{
-        AddUsers();
-        AddPlanes();
-        AddRoutes();
+        if (args.length > 0) {
+            switch (args[0].toLowerCase()) {
+                case "user":
+                    AddUsers();
+                    break;
+                case "plane":
+                    AddPlanes();
+                    break;
+                case "route":
+                    AddRoutes();
+                    break;
+                case "bus":
+                    AddBuses();
+                    break;
+                default:
+                    System.out.println("Invalid argument. Use 'user', 'plane', or 'route'.");
+            }
+        } else {
+            System.out.println("No arguments provided. Use 'user', 'plane', or 'route'.");
+        }
     }
 
 }

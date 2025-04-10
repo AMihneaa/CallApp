@@ -20,7 +20,10 @@ public class RouteRepositoryImpl implements RouteRepositoryCustom{
     public List<Route> findByStopsLocation(String location) {
         Query query = new Query();
         query.addCriteria(Criteria.where("stops.location").is(location));
-        List<Route> routes =  mongoTemplate.find(query, Route.class);
+        System.out.println("Executing query: " + query);
+
+        List<Route> routes = mongoTemplate.find(query, Route.class);
+        System.out.println("Query result: " + routes);
 
         if (routes.isEmpty()){
             System.out.println("No routes found for the given location " + location);
