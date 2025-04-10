@@ -2,6 +2,8 @@ package com.tpi.demo.config;
 
 import com.tpi.demo.models.Airplane.Airplane;
 import com.tpi.demo.models.Airplane.AirplaneRepository;
+import com.tpi.demo.models.Bus.Bus;
+import com.tpi.demo.models.Bus.BusRepository;
 import com.tpi.demo.models.Enums.TransportType;
 import com.tpi.demo.models.Point.StopPoint;
 import com.tpi.demo.models.Privilege.Privilege;
@@ -42,6 +44,9 @@ public class DataLoader implements CommandLineRunner {
 
     @Autowired
     private RouteRepository routeRepository;
+
+    @Autowired
+    private BusRepository busRepository;
 
     private Privilege createPrivilegeIfNotFound(String name){
         return privilegeRepository.findByName(name)
@@ -153,6 +158,24 @@ public class DataLoader implements CommandLineRunner {
         });
     }
 
+    private void AddBuses(){
+        List<Bus> buses = new ArrayList<>();
+
+        buses.add(
+                new Bus("model 1", 10, "company1")
+        );
+        buses.add(
+                new Bus("model 2", 15, "company2")
+        );
+
+        buses.forEach(
+                bus -> busRepository.findByModel(bus.getModel())
+                        .orElseGet(
+                                () -> busRepository.save(bus)
+                        )
+        );
+    }
+
     @Override
     public void run(String... args) throws Exception{
         if (args.length > 0) {
@@ -165,6 +188,9 @@ public class DataLoader implements CommandLineRunner {
                     break;
                 case "route":
                     AddRoutes();
+                    break;
+                case "bus":
+                    AddBuses();
                     break;
                 default:
                     System.out.println("Invalid argument. Use 'user', 'plane', or 'route'.");
