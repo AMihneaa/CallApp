@@ -1,9 +1,18 @@
 package com.tpi.demo.web;
 
+import com.tpi.demo.models.Enums.ReservationType;
+import com.tpi.demo.models.Enums.TransportType;
+import com.tpi.demo.models.Reservation.Reservation;
+import com.tpi.demo.models.Reservation.ReservationDTO;
 import com.tpi.demo.models.Route.Route;
+import com.tpi.demo.models.User.UserDTO;
+import com.tpi.demo.service.ReservationService;
 import com.tpi.demo.service.RouteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,6 +23,8 @@ public class TestController {
 
     @Autowired
     private RouteService routeService;
+    @Autowired
+    private ReservationService reservationService;
 
     @GetMapping("/")
     public String test() {
@@ -34,9 +45,26 @@ public class TestController {
         return routes;
     }
 
+    @GetMapping("/user/{departureLocation}/to/{arrivalLocation}")
+    @PreAuthorize("hasAuthority('ROLE_USER')")
+    public ResponseEntity<List<List<Route>>> findRouteByDepartureAndArrivalLocation(
+            @PathVariable String departureLocation,
+            @PathVariable String arrivalLocation) {
+        try {
+            List<List<Route>> result = routeService.findRouteOptions(departureLocation, arrivalLocation);
+
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
     @GetMapping("/admin")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public String adminTest(){
         return "Admin Page";
     }
+
+
 }
