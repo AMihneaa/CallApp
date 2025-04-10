@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BusRepository extends MongoRepository<String, Bus> {
-    
+
 }
