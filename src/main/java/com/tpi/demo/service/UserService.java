@@ -1,5 +1,6 @@
 package com.tpi.demo.service;
 
+import com.mongodb.MongoException;
 import com.tpi.demo.mapper.UserMapper;
 import com.tpi.demo.models.Role.Role;
 import com.tpi.demo.models.Role.RoleRepository;
@@ -43,5 +44,4 @@ public class UserService {
 
         userRepository.save(user);
     }
-
 }
