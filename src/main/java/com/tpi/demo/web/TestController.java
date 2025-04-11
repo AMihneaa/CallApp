@@ -55,7 +55,7 @@ public class TestController {
         }
     }
 
-    @PostMapping("/user/route/{routeID}/{reservationType}/{email}")
+    @PostMapping("/user/route/{routeID}/{reservationType}")
     @PreAuthorize("hasAuthority('ROLE_USER')")
     public ResponseEntity<?> buyTicketForARoute(
             @PathVariable String routeID,
