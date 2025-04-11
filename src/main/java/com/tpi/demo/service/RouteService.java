@@ -1,12 +1,15 @@
 package com.tpi.demo.service;
 
+import com.mongodb.MongoException;
 import com.tpi.demo.models.Point.StopPoint;
 import com.tpi.demo.models.Route.Route;
 import com.tpi.demo.models.Route.RouteRepository;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -80,6 +83,27 @@ public class RouteService {
         }
 
         return possibleRoutes;
+    }
+
+    public Route findByID(String ID){
+        return routeRepository.findById(ID).orElseThrow(
+                () -> new MongoException("Route id not found")
+        );
+    }
+
+    public void updateSeats(String routeID){
+        Optional<Route> route = routeRepository.findById(routeID);
+
+        if (!route.isPresent()){
+            throw new RuntimeException("Route not exists!");
+        }
+
+        if (route.get().getAvailableSeats() <= 0){
+            throw new RuntimeException("Transport is full!");
+        }
+        route.get().setAvailableSeats(route.get().getAvailableSeats() - 1);
+
+        routeRepository.save(route.get());
     }
 
 }
