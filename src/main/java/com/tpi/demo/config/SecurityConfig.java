@@ -10,9 +10,11 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -20,9 +22,11 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final UserDetailsServiceImpl userDetailsService;
+    private final JwtFilter jwtFilter;
 
-    public SecurityConfig(UserDetailsServiceImpl userDetailsService){
+    public SecurityConfig(UserDetailsServiceImpl userDetailsService, JwtFilter jwtFilter){
         this.userDetailsService = userDetailsService;
+        this.jwtFilter = jwtFilter;
     }
 
     @Bean
@@ -32,14 +36,17 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(
                         (authorize) -> authorize
-                                .requestMatchers("/login").permitAll()
+                                .requestMatchers("/user/login").permitAll()
                                 .requestMatchers("/user/register").permitAll()
-                                .requestMatchers("/test/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN") // Require authentication for /test/**
-                                .anyRequest().authenticated() // Allow authenticated users for any other routes
+                                .requestMatchers("/test/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
+                                .requestMatchers("/airplane/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
+                                .anyRequest().authenticated()
                 )
-                .httpBasic(Customizer.withDefaults())
-                .formLogin(Customizer.withDefaults())
-                .authenticationManager(authenticationManager());
+                .authenticationManager(authenticationManager())
+                .sessionManagement(
+                        sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return httpSecurity.build();
     }
