@@ -1,10 +1,10 @@
 package com.tpi.demo.web;
 
 import com.tpi.demo.config.JWTUtil;
-import com.tpi.demo.models.User.UserDTO;
 import com.tpi.demo.models.User.UserLoginDTO;
 import com.tpi.demo.models.User.UserRegisterDTO;
 import com.tpi.demo.service.UserService;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,7 +13,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
 
+
+import java.net.http.HttpResponse;
 import java.util.Map;
 
 @RestController
@@ -54,6 +57,18 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
+    }
+
+    @PostMapping("/validate")
+    public ResponseEntity<?> validateUser(Authentication auth){
+        if (auth == null || !auth.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid TOKEN!");
+        }
+
+        return ResponseEntity.ok(Map.of(
+                "user", auth.getName(),
+                "authorities", auth.getAuthorities()
+        ));
     }
 
 }

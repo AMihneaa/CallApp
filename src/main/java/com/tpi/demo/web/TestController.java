@@ -3,6 +3,7 @@ package com.tpi.demo.web;
 import com.tpi.demo.models.Route.Route;
 import com.tpi.demo.service.ReservationService;
 import com.tpi.demo.service.RouteService;
+import jakarta.validation.constraints.Null;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,26 +13,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/test")
+@RequestMapping("/reservation")
 public class TestController {
 
     @Autowired
     private RouteService routeService;
     @Autowired
     private ReservationService reservationService;
-
-    @GetMapping("/")
-    public String test() {
-        return "Server is running and u on";
-    }
-
-    @GetMapping("/user")
-    @PreAuthorize("hasAuthority('ROLE_USER')")
-    public String userTest(){
-        return "User Page";
-    }
 
     @GetMapping("/user/{stopPointName}")
     @PreAuthorize("hasAuthority('ROLE_USER')")
@@ -72,12 +63,16 @@ public class TestController {
         }
     }
 
+    @GetMapping("/user/myTicket")
+    @PreAuthorize("hasAuthority('ROLE_USER')")
+    public ResponseEntity<?> myTicket(@AuthenticationPrincipal UserDetails userDetails){
+        try{
+            Map<String, Map<String, Object>> getAllRouteID = reservationService.getAllRouteID(userDetails.getUsername());
 
-    @GetMapping("/admin")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public String adminTest(){
-        return "Admin Page";
+            return ResponseEntity.ok(getAllRouteID);
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e);
+        }
     }
-
 
 }
