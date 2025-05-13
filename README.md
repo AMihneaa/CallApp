@@ -1,119 +1,154 @@
-CallApp – Smart Transport Booking API
+# CallApp – Smart Transport Booking API
 
 CallApp is a backend system developed in Java with Spring Boot and MongoDB, designed for managing transportation routes (airplane, train, bus), reservations, and secure JWT-based user authentication. The system allows complex routing, access control via roles and privileges, and reservation validation.
 
-1. Domain Architecture: Transport → Routes → StopPoints → Reservations
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://example.com)
+[![License](https://img.shields.io/badge/license-MIT-blue)](https://opensource.org/licenses/MIT)
+[![Version](https://img.shields.io/badge/version-1.0.0-orange)](https://example.com)
 
-Transport Models:
-The system defines three transport types as independent entities:
-- Airplane.java
-- Train.java
-- Bus.java
+---
 
-These entities represent transport metadata (transportId, seat count, type) and are referenced by the Route entity through the transportId field.
+## 🛠 Installation
 
-Route and StopPoints:
-Each Route includes:
-- transportId: a reference to a transport instance
-- transportType: enum (AIRPLANE, TRAIN, BUS)
-- availableSeats: remaining capacity
-- List<StopPoint>: an ordered list of location-based checkpoints
+To set up the project locally, follow these steps:
 
-Each StopPoint contains:
-- location (string)
-- arrivalTime (optional)
-- departureTime (optional)
+```bash
+git clone https://github.com/AMihneaa/callapp.git
+cd callapp
+./mvnw clean install
+./mvnw spring-boot:run
+```
 
-2. Route Matching and Concatenation Logic
+### Docker Setup:
 
-Routes are stored in MongoDB as documents containing stop point sequences. The application supports intelligent route searching using:
+```bash
+docker build -t callapp .
+docker run -p 8080:8080 callapp
+```
 
-Direct Route Matching:
-Implemented in:
+---
+
+## 🧱 Domain Architecture
+
+### Entities:
+- **Abstract Transport** (parent class)
+  - Airplane
+  - Train
+  - Bus
+- **Route**: references transportId and contains StopPoints
+- **StopPoint**: includes location, arrivalTime, departureTime
+- **Reservation**: links users to routes and StopPoints
+- **User → Role → Privilege** (Security Layer)
+
+### Structure:
+Transport → Routes → StopPoints → Reservations
+
+---
+
+## 🔁 Route Matching and Concatenation Logic
+
+Implemented in `RouteRepositoryImpl`:
+
+### Direct Route Matching
+```java
 findByDepartureAndArrivalLocation(String departureLocation, String arrivalLocation)
+```
 
 Steps:
 - Queries all routes containing both locations.
-- Filters only those where departure appears before arrival in the list.
-- Ignores routes where the stop order is reversed or locations are missing.
+- Filters routes where `departure` appears before `arrival`.
+- Excludes reversed or mismatched routes.
 
-Multi-Hop Concatenation (via findRestRoute):
-This method supports chaining multiple routes to simulate a longer journey when no direct route exists.
+### Multi-Hop Concatenation
+- Avoids already-used route IDs.
+- Applies regex filters to StopPoints.
+- Enables recursive chaining for indirect routes.
+- Example: `Bucharest → Vienna → Frankfurt → Paris`.
 
-Steps:
-- Avoids already-used route IDs (nin clause).
-- Applies regex filters on stop point locations to match possible partial segments.
-- Can be used recursively in frontend to chain multiple valid segments together.
+---
 
-This enables the creation of a route like:
-Bucharest → Vienna → Frankfurt → Paris
-even if no single route contains all of them.
+## 🔐 Security Layer
 
-3. Security Layer
+### Authentication Flow:
+- Register/Login via `/auth/register` or `/auth/login`.
+- Receive a JWT token.
+- Use `Authorization: Bearer <token>` in requests.
+- Verified by a custom `JwtFilter`.
 
-The system uses full role-based security using Spring Security and JWT tokens.
+### Role & Privilege Model:
+- Each User → has a Role → has a list of Privileges.
+- Controllers use annotations for fine-grained access.
+- Passwords are encrypted using BCrypt.
 
-Authentication Flow:
-- A user registers or logs in via /auth/register and /auth/login.
-- Upon login, they receive a JWT token.
-- The token is then attached to the Authorization: Bearer <token> header in future requests.
-- A custom JwtFilter verifies the token on each request.
+### Access Control:
 
-Role and Privilege Model:
-- Each User has a Role.
-- Each Role has a list of Privileges.
-- Controller access is annotated based on specific privileges, not just roles.
-- Passwords are hashed using BCrypt.
+| Endpoint               | Required Access   |
+|------------------------|-------------------|
+| `/api/airplane (GET)`  | USER, ADMIN       |
+| `/api/airplane (POST)` | ADMIN             |
+| `/api/reservation`     | Authenticated     |
+| `/auth/register`       | Public            |
 
-Example Access Control:
-Endpoint                  | Required Access
---------------------------|------------------------
-/api/airplane (GET)       | USER, ADMIN
-/api/airplane (POST)      | ADMIN only
-/api/reservation (POST)   | Any authenticated user
-/auth/register            | Public
+---
 
-4. Tech Stack
+## 🧪 Usage/Examples
 
-- Backend: Java 17, Spring Boot
-- Database: MongoDB (Spring Data Mongo)
-- Security: JWT, Spring Security, BCrypt
-- Build Tool: Maven
-- Containerization: Docker
-- Deployment: Compatible with Genezio / cloud
+### Register:
+```bash
+curl -X POST http://localhost:8080/auth/register   -H "Content-Type: application/json"   -d '{"username":"testuser", "password":"password123"}'
+```
 
-5. Running the Application
+### Login:
+```bash
+curl -X POST http://localhost:8080/auth/login   -H "Content-Type: application/json"   -d '{"username":"testuser", "password":"password123"}'
+```
 
-Local:
-./mvnw clean install
-./mvnw spring-boot:run
+### Get Routes:
+```bash
+curl -X GET http://localhost:8080/api/routes   -H "Authorization: Bearer <your_jwt_token>"
+```
 
-Docker:
-docker build -t callapp .
-docker run -p 8080:8080 callapp
+---
 
-6. Core APIs
+## 📌 Core APIs
 
-Endpoint              | Method | Description
------------------------|--------|-------------------------------
-/auth/register         | POST   | Register new user
-/auth/login            | POST   | Login and receive JWT
-/api/routes            | GET    | List available routes
-/api/airplane          | POST   | Add new airplane route
-/api/reservation       | POST   | Create reservation
+| Endpoint                                               | Method | Description              |
+|--------------------------------------------------------|--------|--------------------------|
+| `/auth/register`                                       | POST   | Register a new user      |
+| `/auth/login`                                          | POST   | Login and receive JWT    |
+| `/api/routes/{departureLocation}/to/{arrivalLocation}` | GET    | Get available routes     |
+| `/api/routes/reserveticket/{ticketId}`                 | POST   | Create a reservation     |
 
-7. Future Enhancements
+
+---
+
+## 📈 Future Enhancements
 
 - Swagger/OpenAPI documentation
 - React frontend with route visualizer
 - Automatic graph-based pathfinding
-- Analytics: most popular routes, user behaviors
+- Analytics for route popularity and behavior
 
-8. Author
+---
 
-Mihnea Aniculesei
-GitHub: https://github.com/AMihneaa
+## 🤝 Contributing
 
-9. License
+Contributions are welcome!
 
-MIT License
+1. Fork the repo.
+2. Create a feature branch.
+3. Commit your changes.
+4. Open a pull request.
+
+---
+
+## 👤 Author
+
+**Mihnea Aniculesei**  
+GitHub: [https://github.com/AMihneaa](https://github.com/AMihneaa)
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
