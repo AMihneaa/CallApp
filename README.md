@@ -131,16 +131,6 @@ curl -X GET http://localhost:8080/api/routes   -H "Authorization: Bearer <your_j
 
 ---
 
-## 🤝 Contributing
-
-Contributions are welcome!
-
-1. Fork the repo.
-2. Create a feature branch.
-3. Commit your changes.
-4. Open a pull request.
-
----
 
 ## 👤 Author
 
