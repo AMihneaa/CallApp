@@ -1,4 +1,4 @@
-# CallApp – Smart Transport Booking API
+# Smart Transport Booking API
 
 CallApp is a backend system developed in Java with Spring Boot and MongoDB, designed for managing transportation routes (airplane, train, bus), reservations, and secure JWT-based user authentication. The system allows complex routing, access control via roles and privileges, and reservation validation.
 
